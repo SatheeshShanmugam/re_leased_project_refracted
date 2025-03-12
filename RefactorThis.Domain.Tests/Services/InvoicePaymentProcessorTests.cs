@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
@@ -44,7 +45,7 @@ namespace RefactorThis.Domain.Tests
         public async Task ProcessPayment_Should_ReturnExpectedMessage(Payment payment, Invoice invoice, string expectedMessage)
         {
             if (invoice != null)
-                await _InvoiceRepository.Add(invoice, new System.Threading.CancellationToken());
+                await _InvoiceRepository.Add(invoice, CancellationToken.None);
 
             var result = await _invoiceService.Object.ProcessPayment(payment);
 
