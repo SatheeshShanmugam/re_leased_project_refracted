@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Moq;
 using NUnit.Framework;
 using RefactorThis.Domain.Interfaces;
 using RefactorThis.Domain.Utility;
@@ -14,16 +15,16 @@ namespace RefactorThis.Domain.Tests
 	public class Invoice_invoiceServiceTests
 	{
 
-        private IUnitOfWork _unitOfWork;
-        private IInvoiceService _invoiceService;       
+        private Mock<UnitOfWork> _unitOfWork;
+        private Mock<InvoiceService> _invoiceService;       
         private IinvoiceRespository _InvoiceRepository;
 
         [SetUp]
         public void SetUp()
         {
-            _unitOfWork = new UnitOfWork();
-            _invoiceService = new InvoiceService(_unitOfWork);
-            _InvoiceRepository = _unitOfWork.GetRepository<Invoice, InvoiceRepository>(() => new InvoiceRepository());
+            _unitOfWork = new Mock<UnitOfWork>();
+            _invoiceService = new Mock<InvoiceService>(_unitOfWork.Object);
+            _InvoiceRepository =  _unitOfWork.Object.GetRepository<Invoice, InvoiceRepository>(() => new InvoiceRepository()).Result;
         }
         public static IEnumerable<TestCaseData> PaymentTestCases()
         {
@@ -45,7 +46,7 @@ namespace RefactorThis.Domain.Tests
             if (invoice != null)
                 await _InvoiceRepository.Add(invoice, new System.Threading.CancellationToken());
 
-            var result = await _invoiceService.ProcessPayment(payment);
+            var result = await _invoiceService.Object.ProcessPayment(payment);
 
             Assert.AreEqual(expectedMessage, result.Message);
         }

@@ -9,7 +9,7 @@ namespace RefactorThis.Persistence.Interfaces
     public interface IUnitOfWork : IDisposable
     {
         // Get a repository for a specific entity type
-        TRepository GetRepository<T, TRepository>(Func<TRepository> repositoryFactory) where TRepository : class where T : class; 
+         Task<TRepository> GetRepository<T, TRepository>(Func<TRepository> repositoryFactory) where TRepository : class where T : class; 
 
         // "Commit" changes (in-memory)
         Task CommitAsync();

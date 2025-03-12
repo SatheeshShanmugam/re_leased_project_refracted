@@ -26,14 +26,15 @@ namespace RefactorThis.Domain
 		public async Task<ResponseModel> ProcessPayment( Payment payment )
 		{
 			var responseMessage = string.Empty;
+			var ct = new System.Threading.CancellationToken();
 			try
             {
-				IinvoiceRespository _invoiceRepository = _unitOfWork.GetRepository<Invoice,InvoiceRepository>(()=>new InvoiceRepository());
+				IinvoiceRespository _invoiceRepository = await _unitOfWork.GetRepository<Invoice,InvoiceRepository>(()=>new InvoiceRepository());
 
 				if (_invoiceRepository == null) 
 					return new ResponseModel(ResponseMessages.Contact_System_Admin);
 
-				Invoice invoice = await _invoiceRepository.GetInvoice(payment.Reference, new System.Threading.CancellationToken());
+				Invoice invoice = await _invoiceRepository.GetInvoice(payment.Reference,ct );
 
 				if (invoice is null) 
 					return new ResponseModel(ResponseMessages.No_Invoice_Matching_Current_Payment);
@@ -88,7 +89,7 @@ namespace RefactorThis.Domain
 				invoice.AmountPaid += payment.Amount;
 				invoice.Payments.Add(payment);
 
-				await _invoiceRepository.SaveInvoice(invoice, new System.Threading.CancellationToken());
+				await _invoiceRepository.SaveInvoice(invoice, ct);
 				await _unitOfWork.CommitAsync();
 				return new ResponseModel(responseMessage); 
 			}

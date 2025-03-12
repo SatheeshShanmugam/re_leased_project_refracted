@@ -12,14 +12,14 @@ namespace RefactorThis.Persistence.UnitOfWork
     {
         private readonly Dictionary<Type, object> _repositories = new Dictionary<Type, object>();
 
-        public TRepository GetRepository<T, TRepository>(Func<TRepository> repositoryFactory) where T : class where TRepository : class
+        public async Task<TRepository> GetRepository<T, TRepository>(Func<TRepository> repositoryFactory) where T : class where TRepository : class
         {
             if (!_repositories.ContainsKey(typeof(T)))
             {
                 
                 _repositories.Add(typeof(T), repositoryFactory());                
             }
-            return _repositories[typeof(T)] as TRepository;            
+            return await Task.FromResult(_repositories[typeof(T)] as TRepository);            
         }       
 
         public Task CommitAsync()
